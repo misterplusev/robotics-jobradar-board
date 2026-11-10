@@ -67,7 +67,10 @@ th{top:0}
  <input id=q placeholder="search title / company / location" size=32>
  <select id=loc><option value="">all locations</option></select>
  <select id=src><option value="">all sources</option></select>
- <select id=st><option value="">active + closed</option><option value="1">active only</option><option value="0">closed only</option><option value="applied">applied only</option></select>
+ <select id=st><option value="">active + closed</option><option value="1" selected>active only</option><option value="0">closed only</option><option value="applied">applied only</option></select>
+ <label>Sort <select id=sort><option value="newest">Newest posted first</option><option value="oldest">Oldest posted first</option><option value="company">Company A–Z</option><option value="title">Title A–Z</option><option value="location">Location A–Z</option></select></label>
+ <label>Start with <select id=limit><option>100</option><option>200</option><option>500</option><option value="all">All</option></select></label>
+ <label><input type=checkbox id=international> Include international &amp; unspecified locations</label>
  <label><input type=checkbox id=rem> remote only</label>
  <label title="Hides postings from pure-software companies (Databricks, OpenAI, Stripe, Anthropic, Airbnb, Coinbase, Robinhood, Ramp, Figma) and the Figure Lending mortgage board. These boards are scraped as seed sources but are not robotics employers."><input type=checkbox id=offtopic checked> hide off-topic</label>
  </div>
@@ -79,9 +82,12 @@ th{top:0}
  <div class=abet-chip-loader role=status aria-live=polite><div class=abet-chip-perspective><div class=abet-chip-spinner><div class=abet-chip-face><span class=abet-chip-seg style="transform:rotate(0deg)"></span><span class=abet-chip-seg style="transform:rotate(45deg)"></span><span class=abet-chip-seg style="transform:rotate(90deg)"></span><span class=abet-chip-seg style="transform:rotate(135deg)"></span><span class=abet-chip-seg style="transform:rotate(180deg)"></span><span class=abet-chip-seg style="transform:rotate(225deg)"></span><span class=abet-chip-seg style="transform:rotate(270deg)"></span><span class=abet-chip-seg style="transform:rotate(315deg)"></span><span class=abet-chip-txt>α</span></div><div class="abet-chip-face abet-chip-back"><span class=abet-chip-seg style="transform:rotate(0deg)"></span><span class=abet-chip-seg style="transform:rotate(45deg)"></span><span class=abet-chip-seg style="transform:rotate(90deg)"></span><span class=abet-chip-seg style="transform:rotate(135deg)"></span><span class=abet-chip-seg style="transform:rotate(180deg)"></span><span class=abet-chip-seg style="transform:rotate(225deg)"></span><span class=abet-chip-seg style="transform:rotate(270deg)"></span><span class=abet-chip-seg style="transform:rotate(315deg)"></span><span class=abet-chip-txt>α</span></div></div></div></div>
  <div id=loadprogress class=muted>Loading jobs...</div>
 </div>
-<div id=tblscroll class=tblscroll><table id=tblwrap style=display:none><thead><tr><th data-k=title>Title</th><th data-k=company>Company</th><th data-k=location>Location</th><th data-k=ats>Source</th><th data-k=posted_at>Posted</th><th data-k=scraped_at>Status</th><th>Applied?</th></tr></thead><tbody id=tb></tbody></table></div>
-<script>
+<div id=tblscroll class=tblscroll><table id=tblwrap style=display:none><thead><tr><th data-k=title>Title</th><th data-k=company>Company</th><th data-k=location>Location</th><th data-k=ats>Source</th><th data-k=posted_at>Posted</th><th data-k=scraped_at>Status</th><th>Applied?</th></tr></thead><tbody id=tb></tbody></table><div id="results" style="padding:16px 20px"></div><div id="sentinel" style="padding:12px 20px"><button class="co-pill" id="more" hidden>Show more</button><span id="more-note"></span></div></div>
+<script type="module">
+import { compareJobs, jobGeography, postedLabel, initialVisibleCount, nextVisibleCount, fetchAllJobRows } from './job-board-core.mjs';
 const SB_URL="https://alxgteasytezekyunyjk.supabase.co", SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFseGd0ZWFzeXRlemVreXVueWprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDg0NzgsImV4cCI6MjA5MDUyNDQ3OH0.jpeiWLBepn1O1BeDFJMaM28iWxwRgMA0zIckit6g4Cc", POLL="hourly";
+const international=document.getElementById('international'), limit=document.getElementById('limit'), sort=document.getElementById('sort'), more=document.getElementById('more');
+let shown=100, matching=0, observer;
 let DATA=[], sortK="posted_at", asc=false, APPLIED=new Set(), COMP=new Set();
 const tb=document.getElementById("tb"), q=document.getElementById("q"),
  src=document.getElementById("src"), st=document.getElementById("st"), rem=document.getElementById("rem"),
@@ -148,17 +154,9 @@ async function toggleApplied(company,url,title){
 }
 async function load(){
  APPLIED=await loadApplied();
- let rows=[], offset=0;
- while(true){
-  const r=await fetch(SB_URL+"/rest/v1/robotics_jobs?select=company,title,url,location,ats,posted_at,is_active,scraped_at&order=posted_at.desc.nullslast,scraped_at.desc&limit=1000&offset="+offset,
-   {headers:Object.assign({},SBH,{Range:offset+"-"+(offset+999)})});
-  if(!r.ok){loadwrap.style.display="none";cnt.style.display="block";cnt.textContent="load failed: "+r.status;return}
-  const page=await r.json();
-  rows=rows.concat(page);
-  if(page.length<1000)break;
-  offset+=1000;
-  loadprogress.textContent="Loaded page "+(Math.floor(offset/1000)+1)+" of ~"+(Math.floor(offset/1000)+2)+"...";
- }
+ let rows;
+ try { rows=await fetchAllJobRows({url:SB_URL,key:SB_ANON,table:'robotics_jobs',columns:'id,company,title,url,location,ats,posted_at,is_active,scraped_at',onProgress:n=>loadprogress.textContent='Loaded '+n.toLocaleString()+' jobs…'}) }
+ catch(e){loadwrap.style.display='none';cnt.style.display='block';cnt.textContent=e.message;return}
  DATA=rows;
  loadwrap.style.display="none";
  tblwrap.style.display="table";
@@ -180,9 +178,11 @@ async function load(){
  cnt.textContent=DATA.length+" jobs · "+active+" active"+poll;
  render();
 }
-function render(){
+function render(reset=true){
+ if(reset!==false)shown=initialVisibleCount(limit.value);
  let hidden=0;
  let r=DATA.filter(d=>{
+  if(!international.checked&&jobGeography(d)!=="us")return false;
   if(ofc.checked&&isOffTopic(d)){hidden++;return false}
   if(st.value==="applied"){if(!APPLIED.has(akey(d.company,d.url)))return false}
   else if(st.value!==""&&String(d.is_active?1:0)!==st.value)return false;
@@ -192,15 +192,21 @@ function render(){
   if(rem.checked&&!/remote/i.test(d.location))return false;
   const t=(q.value||"").toLowerCase();
   return !t||(d.title+" "+d.company+" "+d.location).toLowerCase().includes(t);});
- r.sort((a,b)=>{const x=a[sortK],y=b[sortK];const c=(""+(x||"")).localeCompare(""+(y||""),undefined,{numeric:true});return asc?c:-c;});
+ r.sort((a,b)=>sortK==='posted_at'?compareJobs(a,b,asc?'oldest':'newest'):(asc?1:-1)*String(a[sortK]||'').localeCompare(String(b[sortK]||''),undefined,{numeric:true}));
+ matching=r.length;
+ document.getElementById('results').textContent='Showing '+Math.min(shown,matching).toLocaleString()+' of '+matching.toLocaleString()+' matches · '+(international.checked?'All locations':'U.S. locations only');
+ more.hidden=shown>=matching;
+ document.getElementById('more-note').textContent=limit.value==='all'&&shown<matching?' All matches — loads as you scroll':'';
+ observer?.disconnect();
+ if(limit.value==='all'&&shown<matching&&globalThis.IntersectionObserver){observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){shown=nextVisibleCount(shown,limit.value,matching);render(false)}},{rootMargin:'300px'});observer.observe(document.getElementById('sentinel'))}
  ofnote.style.display=hidden?"":"none";
  ofnote.textContent=hidden?("showing "+r.length+" of "+(r.length+hidden)+" — hiding "+hidden+" off-topic posting"+(hidden===1?"":"s")+" from pure-software boards"):"";
- tb.innerHTML=r.map(d=>{const on=APPLIED.has(akey(d.company,d.url));return "<tr>\n"+
+ tb.innerHTML=r.slice(0,shown).map(d=>{const on=APPLIED.has(akey(d.company,d.url));return "<tr>\n"+
   "<td><a href=\""+esc(d.url)+"\" target=_blank rel=noopener>"+esc(d.title)+"</a></td>"+
   "<td><img class=logo src='logos/"+slugify(d.company)+".png' alt='' onerror=\"this.style.display='none'\"><span class='pill company'>"+esc(d.company)+"</span></td>"+
   "<td><span class='pill"+(/remote/i.test(d.location||"")?" remote":"")+"'>"+(esc(d.location)||"—")+"</span></td>"+
   "<td><span class=pill>"+esc(d.ats)+"</span></td>"+
-  "<td><span class='pill date'>"+(esc((d.posted_at||"").slice(0,10))||"—")+"</span></td>"+
+  "<td><span class='pill date'>"+esc(postedLabel(d.posted_at))+"</span></td>"+
   "<td><span class='pill "+(d.is_active?"":"closed")+"'>"+(d.is_active?"active":"closed")+"</span>"+(on?" <span class='pill applied'>applied</span>":"")+"</td>"+
   "<td><button class='apply-btn"+(on?" on":"")+"' data-c=\""+esc(d.company)+"\" data-u=\""+esc(d.url)+"\" data-t=\""+esc(d.title)+"\">"+(on?"✓ applied":"mark applied")+"</button></td>\n</tr>"}).join("");
 }
@@ -223,8 +229,10 @@ tb.addEventListener("click",e=>{
  const b=e.target.closest(".apply-btn"); if(!b)return;
  toggleApplied(b.dataset.c,b.dataset.u,b.dataset.t);
 });
-document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortK)asc=!asc;else{sortK=k;asc=false}render()});
-[q,loc,src,st,rem,ofc].forEach(el=>el.addEventListener("input",render));
+document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortK)asc=!asc;else{sortK=k;asc=k!=='posted_at'}sort.value=sortK==='posted_at'?(asc?'oldest':'newest'):sortK;render()});
+[q,loc,src,st,rem,international,limit,ofc].forEach(el=>el.addEventListener("input",render));
+sort.addEventListener('change',()=>{sortK=['newest','oldest'].includes(sort.value)?'posted_at':sort.value;asc=sort.value!=='newest';render()});
+more.addEventListener('click',()=>{shown=nextVisibleCount(shown,limit.value,matching);render(false)});
 window.addEventListener("resize",setCtrlH);
 new ResizeObserver(setCtrlH).observe(document.querySelector(".controls"));
 load();
