@@ -1,34 +1,6 @@
 <!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Job Radar — Robotics Jobs Monitor</title><style>
-:root{color-scheme:dark}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;background:#0d1117;color:#e6edf3}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid #30363d;background:#0d1117}
-header .muted{flex-basis:100%}
-h1{margin:0 0 4px;font-size:1.75rem;font-weight:600}
-.muted{color:#8b949e;font-size:.875rem}
-.controls{display:flex;gap:10px;flex-wrap:wrap;padding:14px 20px;position:sticky;top:0;background:#0d1117;border-bottom:1px solid #21262d;z-index:5}
-input,select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:6px 10px;font-size:.875rem}
-input:focus,select:focus{border-color:#58a6ff;outline:none}
-table{width:100%;border-collapse:separate;border-spacing:0}
-td,th{padding:8px 12px;border-bottom:1px solid #21262d;text-align:left;vertical-align:middle}
-th{position:sticky;top:var(--ctrl-h,61px);background:#161b22;color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;z-index:2;box-shadow:0 1px 0 #30363d}
-a{color:#58a6ff;text-decoration:none}
-a:hover{text-decoration:underline}
-.logo{width:22px;height:22px;border-radius:6px;background:#161b22;border:1px solid #30363d;object-fit:contain;padding:1px;vertical-align:middle;margin-right:2px}
-.pill{display:inline-block;font-size:11px;padding:2px 8px;border:1px solid #30363d;border-radius:999px;color:#8b949e;background:#161b22}
-.pill.closed{color:#f85149;border-color:rgba(248,81,73,.4)}
-.pill.remote{color:#3fb950;border-color:rgba(63,185,80,.4)}
-.pill.company{color:#58a6ff;border-color:rgba(56,139,253,.4)}
-.pill.date{color:#c9d1d9}
-.pill.applied{color:#FFD600;border-color:rgba(255,214,0,.45)}
-#status{font-size:12px;color:#8b949e;padding:6px 20px}
-.logo-brand{display:inline-flex;align-items:center;gap:3px;line-height:1}
-.logo-alpha{font-family:'Times New Roman',serif;font-size:30px;font-weight:700;color:#FDB515;text-shadow:0 0 18px rgba(253,181,21,.28);line-height:.88;transform:translateY(-1px)}
-.logo-word{font-size:22px;font-weight:900;letter-spacing:.08em;color:#F0F4FA;line-height:.9}
-.logo-wrap{display:flex;align-items:center;gap:10px;flex:1}
-.loading-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:38px 20px}
-.abet-chip-perspective{perspective:620px;width:76px;height:76px}
+<title>ABET | Robotics Jobs</title><link rel="stylesheet" href="standalone.css?v=20261110-2"><style>.abet-chip-perspective{perspective:620px;width:76px;height:76px}
 .abet-chip-spinner{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:abet-chip-flip 2.4s cubic-bezier(.45,.05,.35,1) infinite}
 .abet-chip-face{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;backface-visibility:hidden;border:3px solid #FDB515;outline:1px solid rgba(253,181,21,0.45);outline-offset:-5px;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,0.16),transparent 34%),radial-gradient(circle at 68% 78%,rgba(253,181,21,0.10),transparent 40%),radial-gradient(circle at 34% 30%,#29405a 0%,#16222f 45%,#0d131c 68%,#070B0F 100%);box-shadow:0 0 28px rgba(253,181,21,0.34),0 0 64px rgba(253,181,21,0.12),inset 0 0 18px rgba(253,181,21,0.14),inset 0 2px 6px rgba(0,0,0,0.65)}
 .abet-chip-seg{position:absolute;left:50%;top:2px;width:8px;height:10px;margin-left:-4px;border-radius:3px;background:linear-gradient(180deg,rgba(255,214,102,1) 0%,rgba(253,181,21,0.92) 45%,rgba(180,120,8,0.9) 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,0.45),inset 0 -1px 2px rgba(80,50,0,0.6);transform-origin:50% 36.0px}
@@ -37,34 +9,11 @@ a:hover{text-decoration:underline}
 .abet-chip-loader{display:flex;flex-direction:column;align-items:center;gap:16px;padding:38px 0}
 @keyframes abet-chip-flip{0%{transform:rotateY(0deg) translateY(0)}45%{transform:rotateY(540deg) translateY(-10px)}70%{transform:rotateY(720deg) translateY(0)}78%{transform:rotateY(720deg) translateY(-3px)}86%{transform:rotateY(720deg) translateY(0)}100%{transform:rotateY(720deg) translateY(0)}}
 @media (prefers-reduced-motion:reduce){.abet-chip-spinner{animation:none !important}}
-.frow{flex-basis:100%;min-width:0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.pills{flex-basis:100%;min-width:0;display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;gap:6px;max-height:64px;overflow-x:auto;overflow-y:hidden;padding-bottom:2px}
-td:nth-child(2){white-space:nowrap}
-.co-pill{display:inline-flex;align-items:center;gap:6px;height:28px;box-sizing:border-box;padding:4px 10px;border:1px solid #30363d;border-radius:999px;background:#161b22;color:#c9d1d9;font-size:12px;cursor:pointer}
-.co-pill:hover{border-color:#58a6ff}
-.co-pill img{width:18px;height:18px;border-radius:4px;object-fit:contain;background:#0d1117}
-.co-pill .cnt{color:#8b949e;font-size:11px}
-.co-pill.all{border-color:rgba(255,214,0,.45);color:#FFD600}
-.frow input,.frow select{flex:0 1 auto;min-width:0;max-width:340px}
-.co-pill .mark{display:inline-block;width:11px;transition:transform .15s}
-.co-pill.off .mark{transform:rotate(-90deg)}
-.apply-btn{font-size:11px;padding:3px 10px;border:1px solid #30363d;border-radius:999px;background:#161b22;color:#c9d1d9;cursor:pointer;white-space:nowrap}
-.apply-btn.on{color:#FFD600;border-color:rgba(255,214,0,.5)}
-@media(max-width:900px){
-body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-header,.controls,#status{flex:0 0 auto}
-.controls{position:static}
-.tblscroll{flex:1 1 auto;min-height:0;overflow:auto}
-table{min-width:860px}
-th{top:0}
-}
-</style></head><body>
-<header><div class=logo-wrap><span class=logo-brand><span class=logo-alpha>α</span><span class=logo-word>bet</span></span><h1 style="margin:0;font-size:1.75rem;font-weight:600">Robotics Jobs Monitor</h1></div><button class="co-pill sec" id=sec-head><span class=mark>▾</span></button><div class=muted>live from the persistent database (robotics_jobs) — refreshed on every load</div></header>
-<div class=controls>
- <button class="co-pill sec" id=sec-filters><span class=mark>▾</span> filters</button>
- <button class="co-pill sec" id=sec-pills><span class=mark>▾</span> companies</button>
- <div id=filters class=frow>
- <input id=q placeholder="search title / company / location" size=32>
+</style></head><body><main class="jobs-board">
+<header class="board-header"><a class="abet-wordmark" href="https://abet-dashboard.vercel.app/?section=jobs" aria-label="ABET dashboard"><span class="abet-alpha" aria-hidden="true">α</span><span class="abet-word" aria-hidden="true">bet</span></a><div class="board-heading"><h1>Robotics Jobs</h1><p class="board-subtitle">Career opportunities from employer sources.</p></div><nav class="board-links" aria-label="Job board links"><a href="https://abet-dashboard.vercel.app/?section=jobs">All job boards</a><a href="https://github.com/misterplusev/job-radar/actions/workflows/pipeline.yml">Scraper health</a></nav></header>
+<details class="board-overview" open><summary><span>Summary &amp; companies</span><span id="overview-counts" class="overview-counts">Loading…</span></summary><div class="overview-body"><div class="overview-tools"><div class="overview-stats" id="overview-stats"></div><div class="scroll-buttons"><button id="companies-left" type="button" aria-label="Scroll companies left">←</button><button id="companies-right" type="button" aria-label="Scroll companies right">→</button></div></div><div id="pills" class="company-scroll" role="region" aria-label="Companies filters" tabindex="0"></div></div></details>
+<div id="filters" class="controls board-controls">
+ <input id=q aria-label="Search jobs" placeholder="search title / company / location" size=32>
  <select id=loc><option value="">all locations</option></select>
  <select id=src><option value="">all sources</option></select>
  <select id=st><option value="">active + closed</option><option value="1" selected>active only</option><option value="0">closed only</option><option value="applied">applied only</option></select>
@@ -74,16 +23,15 @@ th{top:0}
  <label><input type=checkbox id=rem> remote only</label>
  <label title="Hides postings from pure-software companies (Databricks, OpenAI, Stripe, Anthropic, Airbnb, Coinbase, Robinhood, Ramp, Figma) and the Figure Lending mortgage board. These boards are scraped as seed sources but are not robotics employers."><input type=checkbox id=offtopic checked> hide off-topic</label>
  </div>
- <div id=pills class=pills></div>
-</div>
-<div id=status style=display:none></div>
+<div id=status class="board-status" style=display:none></div>
 <div id=ofnote class=muted style="padding:0 20px 6px;display:none"></div>
 <div id=loading class=loading-wrap>
  <div class=abet-chip-loader role=status aria-live=polite><div class=abet-chip-perspective><div class=abet-chip-spinner><div class=abet-chip-face><span class=abet-chip-seg style="transform:rotate(0deg)"></span><span class=abet-chip-seg style="transform:rotate(45deg)"></span><span class=abet-chip-seg style="transform:rotate(90deg)"></span><span class=abet-chip-seg style="transform:rotate(135deg)"></span><span class=abet-chip-seg style="transform:rotate(180deg)"></span><span class=abet-chip-seg style="transform:rotate(225deg)"></span><span class=abet-chip-seg style="transform:rotate(270deg)"></span><span class=abet-chip-seg style="transform:rotate(315deg)"></span><span class=abet-chip-txt>α</span></div><div class="abet-chip-face abet-chip-back"><span class=abet-chip-seg style="transform:rotate(0deg)"></span><span class=abet-chip-seg style="transform:rotate(45deg)"></span><span class=abet-chip-seg style="transform:rotate(90deg)"></span><span class=abet-chip-seg style="transform:rotate(135deg)"></span><span class=abet-chip-seg style="transform:rotate(180deg)"></span><span class=abet-chip-seg style="transform:rotate(225deg)"></span><span class=abet-chip-seg style="transform:rotate(270deg)"></span><span class=abet-chip-seg style="transform:rotate(315deg)"></span><span class=abet-chip-txt>α</span></div></div></div></div>
  <div id=loadprogress class=muted>Loading jobs...</div>
 </div>
-<div id=tblscroll class=tblscroll><table id=tblwrap style=display:none><thead><tr><th data-k=title>Title</th><th data-k=company>Company</th><th data-k=location>Location</th><th data-k=ats>Source</th><th data-k=posted_at>Posted</th><th data-k=scraped_at>Status</th><th>Applied?</th></tr></thead><tbody id=tb></tbody></table><div id="results" style="padding:16px 20px"></div><div id="sentinel" style="padding:12px 20px"><button class="co-pill" id="more" hidden>Show more</button><span id="more-note"></span></div></div>
+<div id="results" class="board-results" aria-live="polite"></div><div id="tblwrap" style="display:none"><div id="tb" class="job-list"></div></div><div id="sentinel" class="board-more"><button id="more" type="button" hidden>Show more</button><span id="more-note"></span></div>
 <script type="module">
+import { jobCardMarkup, wireJobDetails, wireCompanyScroll } from './standalone-ui.mjs';
 import { compareJobs, jobGeography, postedLabel, initialVisibleCount, nextVisibleCount, fetchAllJobRows } from './job-board-core.mjs';
 const SB_URL="https://alxgteasytezekyunyjk.supabase.co", SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFseGd0ZWFzeXRlemVreXVueWprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDg0NzgsImV4cCI6MjA5MDUyNDQ3OH0.jpeiWLBepn1O1BeDFJMaM28iWxwRgMA0zIckit6g4Cc", POLL="hourly";
 const international=document.getElementById('international'), limit=document.getElementById('limit'), sort=document.getElementById('sort'), more=document.getElementById('more');
@@ -145,10 +93,10 @@ async function toggleApplied(company,url,title){
   if(APPLIED.has(key)){
    const f="company=eq."+encodeURIComponent(company)+"&job_url=eq."+encodeURIComponent(url);
    const r=await fetch(SB_URL+"/rest/v1/robotics_applications?"+f,{method:"DELETE",headers:SBH});
-   if(r.ok){APPLIED.delete(key);render()}
+   if(r.ok){APPLIED.delete(key);render(false)}
   }else{
    const r=await fetch(SB_URL+"/rest/v1/robotics_applications",{method:"POST",headers:Object.assign({},SBH,{"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"}),body:JSON.stringify([{company:company,job_url:url,job_title:title}])});
-   if(r.ok){APPLIED.add(key);render()}
+   if(r.ok){APPLIED.add(key);render(false)}
   }
  }catch(e){}
 }
@@ -159,14 +107,13 @@ async function load(){
  catch(e){loadwrap.style.display='none';cnt.style.display='block';cnt.textContent=e.message;return}
  DATA=rows;
  loadwrap.style.display="none";
- tblwrap.style.display="table";
+ tblwrap.style.display="block";
  cnt.style.display="block";
  const counts={};
  DATA.forEach(d=>{if(d.company)counts[d.company]=(counts[d.company]||0)+(d.is_active?1:0)});
  const companies=Object.keys(counts).sort((a,b)=>a.localeCompare(b));
- pills.innerHTML="<button class='co-pill all' data-c=''>All</button>"+companies.map(c=>"<button class='co-pill' data-c=\""+esc(c)+"\"><img src='logos/"+slugify(c)+".png' onerror=\"this.style.display='none'\"><span>"+esc(c)+"</span><span class='cnt'>"+counts[c]+"</span></button>").join("");
+ pills.innerHTML="<button class='co-pill all active' aria-pressed='true' data-c=''>All</button>"+companies.map(c=>"<button class='co-pill' aria-pressed='false' data-c=\""+esc(c)+"\"><img src='logos/"+slugify(c)+".png' onerror=\"this.style.display='none'\"><span>"+esc(c)+"</span><span class='cnt'>"+counts[c]+"</span></button>").join("");
  setCtrlH();
- document.getElementById("sec-pills").innerHTML="<span class=mark>▾</span> companies <span class=cnt>"+companies.length+"</span>";
  const sources=[...new Set(DATA.map(d=>d.ats).filter(Boolean))].sort();
  src.innerHTML="<option value=''>all sources</option>"+sources.map(s=>"<option>"+esc(s)+"</option>").join("");
  const locations=[...new Set(DATA.map(d=>(d.location||"").trim()).filter(Boolean))].sort();
@@ -175,7 +122,9 @@ async function load(){
  const lastS=DATA.map(d=>d.scraped_at).filter(Boolean).sort().pop();
  let poll="";
  if(lastS){const mins=Math.max(0,Math.round((Date.now()-new Date(lastS).getTime())/60000));const rtxt=mins<60?mins+"m":Math.floor(mins/60)+"h "+(mins%60)+"m";poll=" · polling: "+POLL+" · last scrape "+rtxt+" ago"}
- cnt.textContent=DATA.length+" jobs · "+active+" active"+poll;
+ cnt.textContent=DATA.length.toLocaleString()+" jobs loaded"+poll;
+ document.getElementById('overview-counts').textContent=active.toLocaleString()+' active';
+ document.getElementById('overview-stats').textContent=DATA.length.toLocaleString()+' total · '+active.toLocaleString()+' active · '+(DATA.length-active).toLocaleString()+' closed';
  render();
 }
 function render(reset=true){
@@ -201,17 +150,11 @@ function render(reset=true){
  if(limit.value==='all'&&shown<matching&&globalThis.IntersectionObserver){observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){shown=nextVisibleCount(shown,limit.value,matching);render(false)}},{rootMargin:'300px'});observer.observe(document.getElementById('sentinel'))}
  ofnote.style.display=hidden?"":"none";
  ofnote.textContent=hidden?("showing "+r.length+" of "+(r.length+hidden)+" — hiding "+hidden+" off-topic posting"+(hidden===1?"":"s")+" from pure-software boards"):"";
- tb.innerHTML=r.slice(0,shown).map(d=>{const on=APPLIED.has(akey(d.company,d.url));return "<tr>\n"+
-  "<td><a href=\""+esc(d.url)+"\" target=_blank rel=noopener>"+esc(d.title)+"</a></td>"+
-  "<td><img class=logo src='logos/"+slugify(d.company)+".png' alt='' onerror=\"this.style.display='none'\"><span class='pill company'>"+esc(d.company)+"</span></td>"+
-  "<td><span class='pill"+(/remote/i.test(d.location||"")?" remote":"")+"'>"+(esc(d.location)||"—")+"</span></td>"+
-  "<td><span class=pill>"+esc(d.ats)+"</span></td>"+
-  "<td><span class='pill date'>"+esc(postedLabel(d.posted_at))+"</span></td>"+
-  "<td><span class='pill "+(d.is_active?"":"closed")+"'>"+(d.is_active?"active":"closed")+"</span>"+(on?" <span class='pill applied'>applied</span>":"")+"</td>"+
-  "<td><button class='apply-btn"+(on?" on":"")+"' data-c=\""+esc(d.company)+"\" data-u=\""+esc(d.url)+"\" data-t=\""+esc(d.title)+"\">"+(on?"✓ applied":"mark applied")+"</button></td>\n</tr>"}).join("");
+ tb.innerHTML=r.slice(0,shown).map(d=>jobCardMarkup(d,{logoUrl:new URL('logos/'+slugify(d.company)+'.png',document.baseURI).href,applied:APPLIED.has(akey(d.company,d.url))})).join('');
+ if(!r.length)tb.innerHTML='<p class="muted">No jobs match these filters.</p>';
 }
-function secToggle(btnId,secSel){const b=document.getElementById(btnId),s=document.querySelector(secSel);b.addEventListener("click",()=>{const hide=s.style.display!=="none";s.style.display=hide?"none":"";b.classList.toggle("off",hide)})}
-secToggle("sec-head","header .muted");secToggle("sec-filters","#filters");secToggle("sec-pills","#pills");pills.addEventListener("wheel",e=>{if(e.deltaY){pills.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+wireJobDetails(tb,{url:SB_URL,key:SB_ANON,table:'robotics_jobs'});
+wireCompanyScroll(pills,document.getElementById('companies-left'),document.getElementById('companies-right'));
 pills.addEventListener("click",e=>{
  const b=e.target.closest(".co-pill"); if(!b)return;
  const c=b.dataset.c;
@@ -220,7 +163,7 @@ pills.addEventListener("click",e=>{
  pills.querySelectorAll(".co-pill").forEach(p=>{
   const pc=p.dataset.c, col=pc?colorOf(pc):"#FFD600";
   const on=!pc?COMP.size===0:COMP.has(pc);
-  p.classList.toggle("active",on);
+  p.classList.toggle("active",on); p.setAttribute("aria-pressed",String(on));
   p.style.borderColor=on?col:""; p.style.background=on?col+"22":"";
  });
  render();
@@ -229,11 +172,10 @@ tb.addEventListener("click",e=>{
  const b=e.target.closest(".apply-btn"); if(!b)return;
  toggleApplied(b.dataset.c,b.dataset.u,b.dataset.t);
 });
-document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortK)asc=!asc;else{sortK=k;asc=k!=='posted_at'}sort.value=sortK==='posted_at'?(asc?'oldest':'newest'):sortK;render()});
 [q,loc,src,st,rem,international,limit,ofc].forEach(el=>el.addEventListener("input",render));
 sort.addEventListener('change',()=>{sortK=['newest','oldest'].includes(sort.value)?'posted_at':sort.value;asc=sort.value!=='newest';render()});
 more.addEventListener('click',()=>{shown=nextVisibleCount(shown,limit.value,matching);render(false)});
 window.addEventListener("resize",setCtrlH);
 new ResizeObserver(setCtrlH).observe(document.querySelector(".controls"));
 load();
-</script></body></html>
+</script></main></body></html>
