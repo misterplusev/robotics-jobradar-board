@@ -117,7 +117,8 @@ export async function fetchAllJobRows({ url, key, table, columns, signal, fetchI
         if (!ids.has(job.id)) { rows.push(job); ids.add(job.id) }
       }
       onProgress?.(rows.length)
-      if (batch.length === 0) return rows
+      // A page shorter than the 1,000 asked for is the last one (one request fewer, and no failure at 99,001 rows).
+      if (batch.length < 1000) return rows
       const next = batch.at(-1).id
       if (String(next) === String(cursor)) throw new Error('Jobs pagination stopped advancing')
       cursor = next
