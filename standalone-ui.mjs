@@ -1,16 +1,16 @@
 import { postedLabel, safeJobUrl } from './job-board-core.mjs'
-export const STANDALONE_UI_VERSION = '2026-11-10.2'
+export const STANDALONE_UI_VERSION = '2026-11-23.1'
 export const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
-export function jobCardMarkup(job, { logoUrl = '', applied = false } = {}) {
+export function jobCardMarkup(job, { logoUrl = '' } = {}) {
   const e = escapeHTML, name = job.company || job.team || 'Employer', url = safeJobUrl(job.url)
   const logo = safeJobUrl(logoUrl), initials = name.split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase()
   return `<article class="job-card">
     <div class="job-card-heading"><span class="job-logo"><span>${e(initials)}</span>${logo ? `<img loading="lazy" src="${e(logo)}" alt="${e(name)} logo" onerror="this.hidden=true">` : ''}</span>
       <div class="job-identity"><span class="job-company">${e(name)}</span><h2 class="job-title">${url ? `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${e(job.title)}</a>` : e(job.title)}</h2></div>
-      <div class="job-actions">${url ? `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">Open listing ↗</a>` : ''}<button type="button" class="apply-btn" aria-pressed="${applied}" data-c="${e(job.company)}" data-u="${e(job.url)}" data-t="${e(job.title)}">${applied ? 'Applied ✓' : 'Mark applied'}</button></div>
+      <div class="job-actions">${url ? `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">Open listing ↗</a>` : ''}</div>
     </div>
     <p class="job-location">${e(job.location || 'Location not listed')}</p>
-    <div class="job-meta"><span>Posted: ${e(postedLabel(job.posted_at))}</span>${job.ats || job.platform ? `<span>${e(job.ats || job.platform)}</span>` : ''}${job.league ? `<span>${e(job.league)}</span>` : ''}<span class="job-badge${job.is_active ? '' : ' closed'}">${job.is_active ? 'Active' : 'Closed'}</span>${/remote/i.test(job.location || '') ? '<span class="job-badge">Remote</span>' : ''}${applied ? '<span class="job-badge applied">Applied</span>' : ''}</div>
+    <div class="job-meta"><span>Posted: ${e(postedLabel(job.posted_at))}</span>${job.ats || job.platform ? `<span>${e(job.ats || job.platform)}</span>` : ''}${job.league ? `<span>${e(job.league)}</span>` : ''}<span class="job-badge${job.is_active ? '' : ' closed'}">${job.is_active ? 'Active' : 'Closed'}</span>${/remote/i.test(job.location || '') ? '<span class="job-badge">Remote</span>' : ''}</div>
     ${job.salary ? `<p class="job-salary">${e(job.salary)}</p>` : ''}
     <details class="job-details" data-id="${e(job.id)}"><summary>Job description</summary><div class="job-description">Open to load the description.</div></details>
   </article>`

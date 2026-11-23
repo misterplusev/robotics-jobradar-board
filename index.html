@@ -16,7 +16,7 @@
  <input id=q aria-label="Search jobs" placeholder="search title / company / location" size=32>
  <select id=loc><option value="">all locations</option></select>
  <select id=src><option value="">all sources</option></select>
- <select id=st><option value="">active + closed</option><option value="1" selected>active only</option><option value="0">closed only</option><option value="applied">applied only</option></select>
+ <select id=st><option value="">active + closed</option><option value="1" selected>active only</option><option value="0">closed only</option></select>
  <label>Sort <select id=sort><option value="newest">Newest posted first</option><option value="oldest">Oldest posted first</option><option value="company">Company A–Z</option><option value="title">Title A–Z</option><option value="location">Location A–Z</option></select></label>
  <label>Start with <select id=limit><option>100</option><option>200</option><option>500</option><option value="all">All</option></select></label>
  <label><input type=checkbox id=international> Include international &amp; unspecified locations</label>
@@ -36,7 +36,7 @@ import { compareJobs, jobGeography, postedLabel, initialVisibleCount, nextVisibl
 const SB_URL="https://alxgteasytezekyunyjk.supabase.co", SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFseGd0ZWFzeXRlemVreXVueWprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDg0NzgsImV4cCI6MjA5MDUyNDQ3OH0.jpeiWLBepn1O1BeDFJMaM28iWxwRgMA0zIckit6g4Cc", POLL="hourly";
 const international=document.getElementById('international'), limit=document.getElementById('limit'), sort=document.getElementById('sort'), more=document.getElementById('more');
 let shown=100, matching=0, observer;
-let DATA=[], sortK="posted_at", asc=false, APPLIED=new Set(), COMP=new Set();
+let DATA=[], sortK="posted_at", asc=false, COMP=new Set();
 const tb=document.getElementById("tb"), q=document.getElementById("q"),
  src=document.getElementById("src"), st=document.getElementById("st"), rem=document.getElementById("rem"),
  loc=document.getElementById("loc"), pills=document.getElementById("pills"),
@@ -73,35 +73,7 @@ function esc(s){return (""+(s||"")).replace(/&/g,"\x26amp;").replace(/</g,"\x26l
 const PALETTE=["#58a6ff","#3fb950","#f778ba","#d29922","#a371f7","#39c5cf","#ff7b72","#7ee787","#f0883e","#79c0ff","#db61a2","#56d364","#e3b341","#ffa657"];
 function colorOf(name){let h=0;for(const ch of (""+name))h=(h*31+ch.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length]}
 function setCtrlH(){document.documentElement.style.setProperty("--ctrl-h",(document.querySelector(".controls").offsetHeight+1)+"px")}
-const akey=(c,u)=>c+"\u0001"+u;
-const SBH={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON};
-async function loadApplied(){
- const set=new Set(); let off=0;
- try{
-  while(true){
-   const r=await fetch(SB_URL+"/rest/v1/robotics_applications?select=company,job_url&limit=1000&offset="+off,{headers:SBH});
-   if(!r.ok)break;
-   const pg=await r.json(); pg.forEach(a=>set.add(akey(a.company,a.job_url)));
-   if(pg.length<1000)break; off+=1000;
-  }
- }catch(e){}
- return set;
-}
-async function toggleApplied(company,url,title){
- const key=akey(company,url);
- try{
-  if(APPLIED.has(key)){
-   const f="company=eq."+encodeURIComponent(company)+"&job_url=eq."+encodeURIComponent(url);
-   const r=await fetch(SB_URL+"/rest/v1/robotics_applications?"+f,{method:"DELETE",headers:SBH});
-   if(r.ok){APPLIED.delete(key);render(false)}
-  }else{
-   const r=await fetch(SB_URL+"/rest/v1/robotics_applications",{method:"POST",headers:Object.assign({},SBH,{"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"}),body:JSON.stringify([{company:company,job_url:url,job_title:title}])});
-   if(r.ok){APPLIED.add(key);render(false)}
-  }
- }catch(e){}
-}
 async function load(){
- APPLIED=await loadApplied();
  let rows;
  try { rows=await fetchAllJobRows({url:SB_URL,key:SB_ANON,table:'robotics_jobs',columns:'id,company,title,url,location,ats,posted_at,is_active,scraped_at',onProgress:n=>loadprogress.textContent='Loaded '+n.toLocaleString()+' jobs…'}) }
  catch(e){loadwrap.style.display='none';cnt.style.display='block';cnt.textContent=e.message;return}
@@ -133,8 +105,7 @@ function render(reset=true){
  let r=DATA.filter(d=>{
   if(!international.checked&&jobGeography(d)!=="us")return false;
   if(ofc.checked&&isOffTopic(d)){hidden++;return false}
-  if(st.value==="applied"){if(!APPLIED.has(akey(d.company,d.url)))return false}
-  else if(st.value!==""&&String(d.is_active?1:0)!==st.value)return false;
+  if(st.value!==""&&String(d.is_active?1:0)!==st.value)return false;
   if(COMP.size&&!COMP.has(d.company))return false;
   if(loc.value&&(d.location||"").trim()!==loc.value)return false;
   if(src.value&&d.ats!==src.value)return false;
@@ -150,7 +121,7 @@ function render(reset=true){
  if(limit.value==='all'&&shown<matching&&globalThis.IntersectionObserver){observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){shown=nextVisibleCount(shown,limit.value,matching);render(false)}},{rootMargin:'300px'});observer.observe(document.getElementById('sentinel'))}
  ofnote.style.display=hidden?"":"none";
  ofnote.textContent=hidden?("showing "+r.length+" of "+(r.length+hidden)+" — hiding "+hidden+" off-topic posting"+(hidden===1?"":"s")+" from pure-software boards"):"";
- tb.innerHTML=r.slice(0,shown).map(d=>jobCardMarkup(d,{logoUrl:new URL('logos/'+slugify(d.company)+'.png',document.baseURI).href,applied:APPLIED.has(akey(d.company,d.url))})).join('');
+ tb.innerHTML=r.slice(0,shown).map(d=>jobCardMarkup(d,{logoUrl:new URL('logos/'+slugify(d.company)+'.png',document.baseURI).href})).join('');
  if(!r.length)tb.innerHTML='<p class="muted">No jobs match these filters.</p>';
 }
 wireJobDetails(tb,{url:SB_URL,key:SB_ANON,table:'robotics_jobs'});
@@ -167,10 +138,6 @@ pills.addEventListener("click",e=>{
   p.style.borderColor=on?col:""; p.style.background=on?col+"22":"";
  });
  render();
-});
-tb.addEventListener("click",e=>{
- const b=e.target.closest(".apply-btn"); if(!b)return;
- toggleApplied(b.dataset.c,b.dataset.u,b.dataset.t);
 });
 [q,loc,src,st,rem,international,limit,ofc].forEach(el=>el.addEventListener("input",render));
 sort.addEventListener('change',()=>{sortK=['newest','oldest'].includes(sort.value)?'posted_at':sort.value;asc=sort.value!=='newest';render()});
